@@ -1,11 +1,12 @@
 import datetime as dt
 import json
-from collections import namedtuple
+from dataclasses import dataclass
 from functools import singledispatch
-from typing import List, Union
+from typing import Generator, List, Tuple
 
 import praw
-from praw.models.comment_forest import CommentForest, Comment
+
+from ..common.reddit_post import RedditPost
 
 
 @dataclass(frozen=True, init=False)
@@ -32,14 +33,6 @@ class Config:
         self.redirect_uri = 'http://localhost:8080'
 
 
-@dataclass
-class RedditPost:
-    id: str
-    title: str
-    text: str
-    comments: CommentForest
-
-
 def connect_and_configure(config_file: str) -> praw.Reddit:
     config = Config(config_file)
     reddit_conn = praw.Reddit(
@@ -56,11 +49,12 @@ def parse_subreddit(
     post_limit: int,
     reddit_conn: praw.Reddit,
     sub_name: str = 'SuicideWatch'
-):
-    posts: List[RedditPost] = []
+) -> List[RedditPost]:
     subreddit = reddit_conn.subreddit(sub_name)
+    posts: List[RedditPost] = []
 
     for post in subreddit.new(limit=post_limit):
+        post.comments.replace_more()
         posts.append(RedditPost(
             id = post.id,
             title = post.title,
@@ -68,6 +62,7 @@ def parse_subreddit(
             comments = post.comments
         ))
 
+    return posts
 
 
 @parse_subreddit.register
@@ -76,4 +71,24 @@ def _(
     reddit_conn: praw.Reddit,
     sub_name: str = 'SuicideWatch'
 ):
-    ...
+    subreddit = reddit_conn.subreddit(sub_name)
+    posts: List[RedditPost] = []
+    post_limit = (
+        (dt.date.today() - post_limit)
+        .replace(tzinfo=dt.timezone.utc)
+        .timetuple()
+    )
+
+    for post in subreddit.new():
+        if post.created_utc < post_limit:
+            break
+
+        post.comments.replace_more()
+        posts.append(RedditPost(
+            id = post.id,
+            title = post.title,
+            text = post.selftext,
+            comments = post.comments
+        ))
+
+    return posts
