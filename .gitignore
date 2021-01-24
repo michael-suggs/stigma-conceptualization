@@ -1,6 +1,8 @@
 # Personal, local, and configuration files
 .config
 config.json
+data/*
+notebooks/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
