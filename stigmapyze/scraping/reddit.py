@@ -2,14 +2,14 @@ import datetime as dt
 import json
 from dataclasses import dataclass
 from functools import singledispatch
-from typing import Generator, List, Tuple
+from typing import List
 
 import praw
 
 from ..common.reddit_post import RedditPost
 
 
-@dataclass(frozen=True, init=False)
+@dataclass(init=False)
 class Config:
     """Config class for PRAW instance.
 

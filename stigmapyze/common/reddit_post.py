@@ -1,8 +1,38 @@
 import json
+from __future__ import annotations
 from dataclasses import dataclass
-from typing import Generator, List, TextIo, Tuple
+from typing import Dict, Generator, List, TextIO, Tuple
 
-from praw.models.comment_forest import Comment, CommentForest
+from praw.models import Comment
+from praw.models.comment_forest import CommentForest
+
+
+class RedditComment:
+    id: str
+    body: str
+    is_root: bool
+    is_submitter: str
+    parent_id: str
+    score: int
+    replies: Dict[str, RedditComment]
+
+    def __init__(self, comment: Comment) -> None:
+        self.id = comment.id
+        self.body = comment.body
+        self.is_submitter = comment.is_submitter
+        self.parent_id = comment.parent_id
+        self.score = comment.score
+        self.replies = ... # TODO finish this
+
+    def __repr__(self) -> str:
+        pass
+
+    def __str__(self) -> str:
+        pass
+
+    @staticmethod
+    def parse_comments(comments: List[Comment]) -> List[RedditComment]:
+        ...
 
 
 @dataclass
@@ -37,7 +67,7 @@ class RedditPost:
             'comments': self.comments.list()
         }, indent=4)
 
-    def get_top_level_comments(self) -> Generator[Tuple[str, str]]:
+    def get_top_level_comments(self) -> Generator[Tuple[str, str], None, None]:
         """Yields all top-level comments for this post.
 
         Yields:
@@ -59,7 +89,7 @@ class RedditPost:
         """
         return self.comments.list()
 
-    def write_post(self, fp: TextIo, top_level_only: bool = False) -> None:
+    def write_post(self, fp: TextIO, top_level_only: bool = False) -> None:
         """Writes a post to a given file.
 
         Parameters
@@ -71,9 +101,9 @@ class RedditPost:
         """
         comments = (list(self.get_top_level_comments()) if top_level_only
             else self.get_flattened_comments())
-        json.dump(fp, {
+        json.dump({
             'id': self.id,
             'title': self.title,
             'text': self.text,
             'comments': comments
-        }, indent=4)
+        }, fp, indent=4)
