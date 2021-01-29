@@ -103,14 +103,11 @@ def _(
     """
     subreddit = reddit_conn.subreddit(sub_name)
     # posts: List[RedditPost] = []
-    post_limit = (
-        (dt.date.today() - post_limit)
-        .replace(tzinfo=dt.timezone.utc)
-        .timetuple()
-    )
+    post_limit = (dt.datetime.utcnow() - post_limit)
 
     for post in subreddit.new():
-        if post.created_utc < post_limit:
+        post_utc = dt.datetime.utcfromtimestamp(post.created_utc)
+        if post_utc < post_limit:
             break
 
         yield RedditPost(post)

@@ -1,16 +1,17 @@
-import json
+from datetime import timedelta
+from praw.models import Submission
 from stigmapyze.scraping import reddit
 
 
 if __name__ == '__main__':
+    timelimit = timedelta(weeks=1)
     rconn = reddit.connect_and_configure('config.json')
-    posts = reddit.parse_subreddit(2, rconn, 'SuicideWatch')
+    posts = reddit.parse_subreddit(timelimit, rconn, 'SuicideWatch')
 
     with open('data/output/posts.json', 'w', encoding='utf-8') as f:
         f.write('[\n')
+        posts.__next__().write_post(f)
         for post in posts:
-            post.write_post(f)
             f.write(',\n')
+            post.write_post(f)
         f.write('\n]')
-        # json.dump(list(map(lambda x: x.__dict__, posts)), f, indent=4, ensure_ascii=False)
-        # post.write_post(f)
