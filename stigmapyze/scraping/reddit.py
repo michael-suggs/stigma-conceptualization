@@ -2,7 +2,7 @@ import datetime as dt
 import json
 from dataclasses import dataclass
 from functools import singledispatch
-from typing import List
+from typing import List, Generator
 
 import praw
 
@@ -57,7 +57,7 @@ def parse_subreddit(
     post_limit: int,
     reddit_conn: praw.Reddit,
     sub_name: str = 'SuicideWatch'
-) -> List[RedditPost]:
+) -> Generator[RedditPost, None, None]:
     """Parses a desired number of posts and comments from a given subreddit.
 
     Args:
@@ -71,18 +71,9 @@ def parse_subreddit(
             text, and the post's CommentForest object containing all comments.
     """
     subreddit = reddit_conn.subreddit(sub_name)
-    posts: List[RedditPost] = []
 
-    for post in subreddit.new(limit=post_limit):
-        post.comments.replace_more()
-        posts.append(RedditPost(
-            id = post.id,
-            title = post.title,
-            text = post.selftext,
-            comments = post.comments
-        ))
-
-    return posts
+    for post in subreddit.top(limit=post_limit):
+        yield RedditPost(post)
 
 
 @parse_subreddit.register
@@ -90,7 +81,7 @@ def _(
     post_limit: dt.timedelta,
     reddit_conn: praw.Reddit,
     sub_name: str = 'SuicideWatch'
-) -> List[RedditPost]:
+) -> Generator[RedditPost, None, None]:
     """Dispatched method for `parse_subreddit` with a timedelta instead.
 
     Parses posts (and their respective comments) from within a given timeframe
@@ -111,7 +102,7 @@ def _(
             text, and the post's CommentForest object containing all comments.
     """
     subreddit = reddit_conn.subreddit(sub_name)
-    posts: List[RedditPost] = []
+    # posts: List[RedditPost] = []
     post_limit = (
         (dt.date.today() - post_limit)
         .replace(tzinfo=dt.timezone.utc)
@@ -122,12 +113,4 @@ def _(
         if post.created_utc < post_limit:
             break
 
-        post.comments.replace_more()
-        posts.append(RedditPost(
-            id = post.id,
-            title = post.title,
-            text = post.selftext,
-            comments = post.comments
-        ))
-
-    return posts
+        yield RedditPost(post)
