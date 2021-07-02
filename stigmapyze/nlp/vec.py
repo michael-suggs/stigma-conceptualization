@@ -12,4 +12,4 @@ def sentence_vec_normed(text: str):
 
     embedded = []
     for word in words:
-
+        continue
