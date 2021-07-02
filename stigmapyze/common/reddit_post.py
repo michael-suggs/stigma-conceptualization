@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+import datetime as dt
 import json
 from typing import Dict, Generator, List, TextIO, Tuple
 
@@ -72,12 +72,14 @@ class RedditPost:
     id: str
     title: str
     text: str
+    time: str
     comments: CommentForest
 
     def __init__(self, post: Submission) -> None:
         self.id = post.id
         self.title = post.title
         self.text = post.selftext
+        self.time = dt.datetime.utcfromtimestamp(post.created_utc).isoformat()
         self.comments = post.comments
 
         post_id = f't3_{self.id}'
@@ -91,6 +93,7 @@ class RedditPost:
             'id': self.id,
             'title': self.title,
             'text': self.text,
+            'time': self.time,
             'comments': self.comments
         })
 
@@ -99,6 +102,7 @@ class RedditPost:
             'id': self.id,
             'title': self.title,
             'text': self.text,
+            'time': self.time,
             'comments': self.comments
         }, indent=4)
 
@@ -141,6 +145,7 @@ class RedditPost:
             'id': self.id,
             'title': self.title,
             'text': self.text,
+            'time': self.time,
             'comments': self.comments
         }, fp, indent=4, ensure_ascii=False)
 

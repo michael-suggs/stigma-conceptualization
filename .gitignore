@@ -1,5 +1,6 @@
 # Personal, local, and configuration files
 .config
+config.ini
 config.json
 data/*
 notebooks/*

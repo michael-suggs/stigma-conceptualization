@@ -105,9 +105,10 @@ def _(
     # posts: List[RedditPost] = []
     post_limit = (dt.datetime.utcnow() - post_limit)
 
-    for post in subreddit.new():
+    for post in subreddit.new(limit=None):
         post_utc = dt.datetime.utcfromtimestamp(post.created_utc)
         if post_utc < post_limit:
+            print(f'Breaking: {post_utc} < {post_limit}')
             break
 
         yield RedditPost(post)
