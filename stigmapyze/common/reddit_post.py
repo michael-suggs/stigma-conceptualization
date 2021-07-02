@@ -25,29 +25,34 @@ class RedditComment:
         self.is_submitter = comment.is_submitter
         self.parent_id = comment.parent_id
         self.score = comment.score
-        self.replies = ... # TODO finish this
+        self.replies = ...  # TODO finish this
 
     def __repr__(self) -> str:
-        return json.dumps({
-            'id': self.id,
-            'body': self.body,
-            'is_root': self.is_root,
-            'is_submitter': self.is_submitter,
-            'parent_id': self.parent_id,
-            'score': self.score,
-            'replies': self.replies
-        })
+        return json.dumps(
+            {
+                'id': self.id,
+                'body': self.body,
+                'is_root': self.is_root,
+                'is_submitter': self.is_submitter,
+                'parent_id': self.parent_id,
+                'score': self.score,
+                'replies': self.replies
+            }
+        )
 
     def __str__(self) -> str:
-        return json.dumps({
-            'id': self.id,
-            'body': self.body,
-            'is_root': self.is_root,
-            'is_submitter': self.is_submitter,
-            'parent_id': self.parent_id,
-            'score': self.score,
-            'replies': self.replies
-        }, indent=4)
+        return json.dumps(
+            {
+                'id': self.id,
+                'body': self.body,
+                'is_root': self.is_root,
+                'is_submitter': self.is_submitter,
+                'parent_id': self.parent_id,
+                'score': self.score,
+                'replies': self.replies
+            },
+            indent=4
+        )
 
     @staticmethod
     def parse_replies(replies: CommentForest) -> List[RedditComment]:
@@ -85,26 +90,34 @@ class RedditPost:
         post_id = f't3_{self.id}'
         non_root = list(filter(lambda x: not x.is_root, self.comments))
 
-        self.comments = [RedditPost.comments_to_json(c, non_root) for c in
-            self.comments if post_id == c.parent_id]
+        self.comments = [
+            RedditPost.comments_to_json(c, non_root)
+            for c in self.comments
+            if post_id == c.parent_id
+        ]
 
     def __repr__(self) -> str:
-        return json.dumps({
-            'id': self.id,
-            'title': self.title,
-            'text': self.text,
-            'time': self.time,
-            'comments': self.comments
-        })
+        return json.dumps(
+            {
+                'id': self.id,
+                'title': self.title,
+                'text': self.text,
+                'time': self.time,
+                'comments': self.comments
+            }
+        )
 
     def __str__(self) -> str:
-        return json.dumps({
-            'id': self.id,
-            'title': self.title,
-            'text': self.text,
-            'time': self.time,
-            'comments': self.comments
-        }, indent=4)
+        return json.dumps(
+            {
+                'id': self.id,
+                'title': self.title,
+                'text': self.text,
+                'time': self.time,
+                'comments': self.comments
+            },
+            indent=4
+        )
 
     def get_top_level_comments(self) -> Generator[Tuple[str, str], None, None]:
         """Yields all top-level comments for this post.
@@ -141,18 +154,25 @@ class RedditPost:
         # comments = [RedditPost.comments_to_json(c, self.comments) for c in
         #         self.comments if f't3_{c.parent_id}' == self.id]
 
-        json.dump({
-            'id': self.id,
-            'title': self.title,
-            'text': self.text,
-            'time': self.time,
-            'comments': self.comments
-        }, fp, indent=4, ensure_ascii=False)
+        json.dump(
+            {
+                'id': self.id,
+                'title': self.title,
+                'text': self.text,
+                'time': self.time,
+                'comments': self.comments
+            },
+            fp,
+            indent=4,
+            ensure_ascii=False
+        )
 
     @staticmethod
     def comments_to_json(comment: Comment, replies: List[Comment]) -> str:
-        children = [RedditPost.comments_to_json(child, replies) for child in
-            filter(lambda c: f't1_{c.parent_id}' == comment.id, replies)]
+        children = [
+            RedditPost.comments_to_json(child, replies) for child in
+            filter(lambda c: f't1_{c.parent_id}' == comment.id, replies)
+        ]
 
         return {
             'id': comment.id,

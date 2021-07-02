@@ -97,7 +97,9 @@ def query_comments(
         if resp.status_code != 200:
             if err and err.flag == PSFlag.HTTPERROR:
                 if err._errcount == ERRLIMIT:
-                    raise ConnectionRefusedError(f'HTTP {resp.status_code}: {query}')
+                    raise ConnectionRefusedError(
+                        f'HTTP {resp.status_code}: {query}'
+                    )
                 err._errcount += 1
             else:
                 err = PSReturn(None, PSFlag.HTTPERROR, 1)
@@ -112,9 +114,7 @@ def query_comments(
     return comments
 
 
-def query_submission_comments(
-    submission_id: str
-) -> Dict[str, dict]:
+def query_submission_comments(submission_id: str) -> Dict[str, dict]:
     err: PSReturn = None
     query = Endpoint.SUBMCOMMENTS(submission_id)
     while True:
@@ -122,7 +122,9 @@ def query_submission_comments(
         if resp.status_code != 200:
             if err and err.flag == PSFlag.HTTPERROR:
                 if err._errcount == ERRLIMIT:
-                    raise ConnectionRefusedError(f'HTTP {resp.status_code}: {query}')
+                    raise ConnectionRefusedError(
+                        f'HTTP {resp.status_code}: {query}'
+                    )
                 err._errcount += 1
             else:
                 err = PSReturn(None, PSFlag.HTTPERROR, 1)
@@ -132,7 +134,9 @@ def query_submission_comments(
         else:
             break
 
-    comments = list(query_comments(ids=[id for id in resp.json()['data']]).values())
+    comments = list(
+        query_comments(ids=[id for id in resp.json()['data']]).values()
+    )
     # comments = {id: query_comments(id)[id] for id in resp.json()['data']}
     return comments
 
@@ -198,7 +202,9 @@ def query_submissions(
         if data.status_code != 200:
             if err and err.flag == PSFlag.HTTPERROR:
                 if err._errcount == ERRLIMIT:
-                    raise ConnectionRefusedError(f'HTTP {data.status_code}: {submissions[-1].created_utc}')
+                    raise ConnectionRefusedError(
+                        f'HTTP {data.status_code}: {submissions[-1].created_utc}'
+                    )
                 err._errcount += 1
             else:
                 err = PSReturn(None, PSFlag.HTTPERROR, 1)
@@ -218,7 +224,9 @@ def query_submissions(
         if len(subm) == 0:
             if err and err.flag == PSFlag.SUBMLENERROR:
                 if err._errcount == ERRLIMIT:
-                    raise ValueError(f'Empty subm: {submissions[-1].created_utc}')
+                    raise ValueError(
+                        f'Empty subm: {submissions[-1].created_utc}'
+                    )
                 err._errcount += 1
             else:
                 err = PSReturn(None, PSFlag.SUBMLENERROR, 1)
@@ -233,7 +241,9 @@ def query_submissions(
         if submissions[-1].created_utc >= before or nsubs == 0:
             for sub in submissions:
                 yield sub
-            print(f'({prev_time.strftime("%Y-%m-%dT%H:%M:%S%Z")}) Finished batch of {nsubs} in {str(datetime.now() - prev_time)}.\n')
+            print(
+                f'({prev_time.strftime("%Y-%m-%dT%H:%M:%S%Z")}) Finished batch of {nsubs} in {str(datetime.now() - prev_time)}.\n'
+            )
             break
             # return submissions, PSReturn(submissions[-1].created_utc, PSFlag.DONE)
         else:
@@ -241,7 +251,9 @@ def query_submissions(
             for sub in submissions:
                 yield sub
 
-            print(f'({datetime.now().strftime("%Y-%m-%dT%H:%M:%S%Z")}) Finished batch of {nsubs} in {str(datetime.now() - prev_time)} (last {new_after}).\n')
+            print(
+                f'({datetime.now().strftime("%Y-%m-%dT%H:%M:%S%Z")}) Finished batch of {nsubs} in {str(datetime.now() - prev_time)} (last {new_after}).\n'
+            )
             prev_time = datetime.now()
             param_str = re.sub(
                 r'([&?])after=.*([&$])', f'\g<1>{new_after}\g<2>', param_str

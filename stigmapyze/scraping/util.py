@@ -7,11 +7,20 @@ import pandas as pd
 from .pushshift import query_submissions
 from ..common.reddit import Comment, Submission
 
-
 DATE_FORMAT: Final[str] = '%Y-%m-%dT%H:%M:%S%Z'
 STIGMA_HEADER: Final[List[str]] = [
-    'ID', 'Stig_c1', 'Stig_c2', 'Stig_c3', 'Stig_c4', 'Stig_c5',
-    'Challn_c1', 'Challn_c2', 'Challn_c3', 'Challn_c4', 'Challn_c5']
+    'ID',
+    'Stig_c1',
+    'Stig_c2',
+    'Stig_c3',
+    'Stig_c4',
+    'Stig_c5',
+    'Challn_c1',
+    'Challn_c2',
+    'Challn_c3',
+    'Challn_c4',
+    'Challn_c5'
+]
 
 
 def stigma_row(id: str, type: Literal['Submission', 'Comment']) -> dict:
@@ -25,19 +34,32 @@ def scrape_until():
     after_date = (now - timedelta(days=30))
 
     try:
-        sub_file = open(f'data/input/{after_date.strftime(DATE_FORMAT)}-{now.strftime(DATE_FORMAT)}-submissions.csv', 'w')
+        sub_file = open(
+            f'data/input/{after_date.strftime(DATE_FORMAT)}-{now.strftime(DATE_FORMAT)}-submissions.csv',
+            'w'
+        )
         sub_csv = DictWriter(sub_file, fieldnames=Submission.csv_fields())
         sub_csv.writeheader()
 
-        cmt_file = open(f'data/input/{after_date.strftime(DATE_FORMAT)}-{now.strftime(DATE_FORMAT)}-comments.csv', 'w')
+        cmt_file = open(
+            f'data/input/{after_date.strftime(DATE_FORMAT)}-{now.strftime(DATE_FORMAT)}-comments.csv',
+            'w'
+        )
         cmt_csv = DictWriter(cmt_file, fieldnames=Comment.csv_fields())
         cmt_csv.writeheader()
 
-        stg_file = open(f'data/input/{after_date.strftime(DATE_FORMAT)}-{now.strftime(DATE_FORMAT)}-stigma.csv', 'w')
+        stg_file = open(
+            f'data/input/{after_date.strftime(DATE_FORMAT)}-{now.strftime(DATE_FORMAT)}-stigma.csv',
+            'w'
+        )
         stg_csv = DictWriter(stg_file, fieldnames=STIGMA_HEADER)
         stg_csv.writeheader()
 
-        submissions = query_submissions(subreddit='SuicideWatch', after=int(after_date.timestamp()), size=500)
+        submissions = query_submissions(
+            subreddit='SuicideWatch',
+            after=int(after_date.timestamp()),
+            size=500
+        )
         scount, ccount = 0, 0
         for sub in submissions:
             sparams = sub.params(csv=True, datefmt=DATE_FORMAT)

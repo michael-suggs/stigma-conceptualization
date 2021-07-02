@@ -42,9 +42,12 @@ class Comment(RedditContent):
         v = vars(self)
         if datefmt:
             try:
-                v['created_utc'] = datetime.fromtimestamp(v['created_utc']).strftime(datefmt)
+                v['created_utc'] = datetime.fromtimestamp(v['created_utc']
+                                                         ).strftime(datefmt)
             except:
-                print(f'Could not format {v["created_utc"]} with format string {datefmt}.')
+                print(
+                    f'Could not format {v["created_utc"]} with format string {datefmt}.'
+                )
         return v
 
     @staticmethod
@@ -63,7 +66,6 @@ class Comment(RedditContent):
     @classmethod
     def csv_header(cls) -> str:
         return ','.join(cls.csv_fields())
-
 
 
 class Submission(RedditContent):
@@ -95,13 +97,17 @@ class Submission(RedditContent):
     def params(self, csv: bool = False, datefmt: str = None) -> dict:
         v = deepcopy(vars(self))
         # print(v)
-        comment_ids = list(map(lambda c: c.id, v['comments'])) if v['comments'] else []
+        comment_ids = list(map(lambda c: c.id, v['comments'])
+                          ) if v['comments'] else []
         v['comments'] = comment_ids if not csv else str(comment_ids)
         if datefmt:
             try:
-                v['created_utc'] = datetime.fromtimestamp(v['created_utc']).strftime(datefmt)
+                v['created_utc'] = datetime.fromtimestamp(v['created_utc']
+                                                         ).strftime(datefmt)
             except:
-                print(f'Could not format {v["created_utc"]} with format string {datefmt}.')
+                print(
+                    f'Could not format {v["created_utc"]} with format string {datefmt}.'
+                )
         return v
 
     def get_comments(self) -> List[Comment]:

@@ -14,10 +14,12 @@ def get_ngrams(text, n: int, amount: int):
 
 
 def plot_ngrams(text, n: int, amount: int) -> Tuple[Figure, Axes, list]:
-    fig, ax = plt.subplots(figsize=(16,10))
+    fig, ax = plt.subplots(figsize=(16, 10))
     ngrams = get_ngrams(text, 1, amount)
-    ax = sns.barplot(x=list(map(lambda t: t[0], ngrams)),
-                     y=list(map(lambda t: t[1], ngrams)))
+    ax = sns.barplot(
+        x=list(map(lambda t: t[0], ngrams)),
+        y=list(map(lambda t: t[1], ngrams))
+    )
     ax.set_title(f'NGrams (N={n}), by frequency')
     ax.set_xlabel('Frequency (count)')
     ax.set_ylabel('ngrams')
