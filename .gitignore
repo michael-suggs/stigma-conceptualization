@@ -3,7 +3,6 @@
 config.ini
 config.json
 data/*
-notebooks/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
